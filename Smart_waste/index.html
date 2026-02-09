@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoChain - Smart Waste Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .tab-active {
+            background-color: #10B981;
+            color: white;
+        }
+        .btn-loading {
+            background-color: #047857;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-emerald-400">EcoChain</h1>
+            <p class="text-gray-400 mt-2">Decentralized Waste Management for Smarter Cities</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: Reporting and User Profile -->
+            <div class="lg:col-span-1 space-y-8">
+                
+                <!-- User Profile & Rewards -->
+                <div class="glassmorphism p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Your Eco-Profile</h2>
+                    <div class="flex items-center space-x-4">
+                        <img src="https://placehold.co/64x64/10B981/FFFFFF?text=U" class="rounded-full" alt="User Avatar">
+                        <div>
+                            <p class="font-bold">Citizen Reporter #1337</p>
+                            <div class="flex items-center mt-1">
+                                <span class="text-emerald-400 font-bold text-xl" id="eco-points">150</span>
+                                <span class="ml-2 text-gray-400">Eco-Points</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Earn points by reporting waste. Redeem them for local discounts or donate to green initiatives!</p>
+                </div>
+
+                <!-- Waste Reporting Form -->
+                <div class="glassmorphism p-6 rounded-2xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Report Roadside Waste</h2>
+                    <form id="waste-report-form">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="location" class="block text-sm font-medium text-gray-300">Location / Landmark</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <input type="text" id="location" name="location" required placeholder="Click button or enter manually" class="block w-full bg-gray-800 border-gray-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-white p-2">
+                                    <button type="button" id="get-location-btn" class="p-2 bg-emerald-600 hover:bg-emerald-700 rounded-md" title="Use Current Location">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    </button>
+                                </div>
+                                <p id="location-status" class="text-xs text-gray-400 mt-1 h-4"></p>
+                            </div>
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-300">Description</label>
+                                <textarea id="description" name="description" rows="3" class="mt-1 block w-full bg-gray-800 border-gray-600 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-white p-2"></textarea>
+                            </div>
+                            <div>
+                                <label for="waste-photo" class="block text-sm font-medium text-gray-300">Upload Photo</label>
+                                <input type="file" id="waste-photo" name="waste-photo" accept="image/*" required class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-500 file:text-white hover:file:bg-emerald-600">
+                                <img id="image-preview" class="mt-4 rounded-lg hidden" alt="Image Preview"/>
+                            </div>
+                            <button type="submit" id="submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-lg">
+                                Submit Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Dashboard -->
+            <div class="lg:col-span-2 glassmorphism p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4">Live Operations Dashboard</h2>
+                
+                <div class="mb-4 border-b border-gray-700">
+                    <nav class="flex space-x-2" id="tabs">
+                        <button data-tab="reports" class="tab-btn tab-active py-2 px-4 rounded-t-lg font-medium">Waste Reports</button>
+                        <button data-tab="bins" class="tab-btn py-2 px-4 rounded-t-lg font-medium">Smart Bins</button>
+                        <button data-tab="blockchain" class="tab-btn py-2 px-4 rounded-t-lg font-medium">Blockchain Ledger</button>
+                    </nav>
+                </div>
+
+                <div id="tab-content" class="space-y-4 h-[600px] overflow-y-auto pr-2">
+                    <div id="reports-content" class="tab-pane"></div>
+                    <div id="bins-content" class="tab-pane hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="smart-bins-grid"></div>
+                    </div>
+                    <div id="blockchain-content" class="tab-pane hidden font-mono text-xs"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Message Modal -->
+        <div id="message-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+            <div class="glassmorphism p-8 rounded-2xl shadow-2xl text-center max-w-sm mx-auto">
+                <h3 id="modal-title" class="text-xl font-bold text-emerald-400 mb-2"></h3>
+                <p id="modal-message" class="text-gray-300 mb-6"></p>
+                <button id="modal-close" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- This is the main script that controls the page -->
+    <script>
+const TELEGRAM_BOT_TOKEN = '8454933844:AAFAhKTn-HwEjxcOcliezUFb8tA1nWe5mnc'; // Replace with your bot token
+const TELEGRAM_CHAT_ID = '5984367463';   // Replace with the admin's chat ID
+const IMGBB_API_KEY = 'dbc4548e05e596f6d66d678e32bcba58'; // <-- Replace with your imgbb API key
+
+/**
+ * Uploads a base64 image to imgbb and returns the image URL.
+ * @param {string} base64Image
+ * @returns {Promise<string>}
+ */
+async function uploadImageToImgbb(base64Image) {
+    const formData = new FormData();
+    formData.append('key', IMGBB_API_KEY);
+    formData.append('image', base64Image.split(',')[1]); // Remove the data URL prefix
+
+    const response = await fetch('https://api.imgbb.com/1/upload', {
+        method: 'POST',
+        body: formData
+    });
+    const data = await response.json();
+    if (data.success) {
+        return data.data.url;
+    } else {
+        throw new Error('Image upload failed');
+    }
+}
+
+// ...existing code...
+/**
+ * Sends a report to the admin via Telegram bot.
+ * @param {object} reportData
+ */
+async function sendReportToTelegram(reportData) {
+    const message =
+        `🗑️ *New Waste Report*\n` +
+        `*Location:* ${reportData.location}\n` +
+        `*Description:* ${reportData.description || 'N/A'}\n` +
+        `*Severity:* ${reportData.aiAnalysis.severity}\n` +
+        `*Type:* ${reportData.aiAnalysis.wasteType}\n` +
+        `*Confidence:* ${(reportData.aiAnalysis.confidence * 100).toFixed(0)}%\n` +
+        `*Time:* ${new Date(reportData.timestamp).toLocaleString()}`;
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+    const body = {
+        chat_id: '5984367463',
+        photo: reportData.imageUrl,
+        caption: message,
+        parse_mode: "Markdown"
+    };
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+    } catch (err) {
+        console.error("Failed to send Telegram notification:", err);
+    }
+}
+// ...existing code...
+
+        // --- DOM Elements ---
+        const form = document.getElementById('waste-report-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const fileInput = document.getElementById('waste-photo');
+        const imagePreview = document.getElementById('image-preview');
+        const ecoPointsEl = document.getElementById('eco-points');
+        const tabs = document.getElementById('tabs');
+        const reportsContent = document.getElementById('reports-content');
+        const binsContent = document.getElementById('bins-content');
+        const blockchainContent = document.getElementById('blockchain-content');
+        const smartBinsGrid = document.getElementById('smart-bins-grid');
+        const getLocationBtn = document.getElementById('get-location-btn');
+        const locationInput = document.getElementById('location');
+        const locationStatus = document.getElementById('location-status');
+        const messageModal = document.getElementById('message-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalClose = document.getElementById('modal-close');
+
+        // --- State ---
+        let userEcoPoints = 150;
+        let reportIdCounter = 0;
+        let blockIdCounter = 0;
+
+        // --- Initial Data Simulation ---
+        const initialSmartBins = [
+            { id: 'SB-001', location: 'City Park', fillLevel: 75 },
+            { id: 'SB-002', location: 'Main Street', fillLevel: 40 },
+            { id: 'SB-003', location: 'Market Square', fillLevel: 92 },
+            { id: 'SB-004', location: 'Tech Campus', fillLevel: 25 },
+        ];
+
+        // --- Functions ---
+
+        function analyzeWasteImage(imageDataUrl) {
+            console.log("Sending image data for AI analysis...");
+            return new Promise(resolve => {
+                const delay = 1000 + Math.random() * 1500;
+                setTimeout(() => {
+                    const severities = [
+                        { name: 'Low', baseScore: 0.1 }, 
+                        { name: 'Medium', baseScore: 0.4 }, 
+                        { name: 'High', baseScore: 0.7 }, 
+                        { name: 'Critical', baseScore: 0.9 }
+                    ];
+                    const wasteTypes = ['Mixed General', 'Plastic Bottles', 'Organic/Food', 'Hazardous Chemical', 'Construction Debris'];
+                    const randomSeverity = severities[Math.floor(Math.random() * severities.length)];
+                    const randomWasteType = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
+                    const confidence = randomSeverity.baseScore + (Math.random() * 0.09);
+                    const analysisResult = {
+                        severity: randomSeverity.name,
+                        wasteType: randomWasteType,
+                        confidence: parseFloat(confidence.toFixed(2))
+                    };
+                    console.log("AI Analysis Complete:", analysisResult);
+                    resolve(analysisResult);
+                }, delay);
+            });
+        }
+
+        function showMessage(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            messageModal.classList.remove('hidden');
+        }
+
+        modalClose.addEventListener('click', () => messageModal.classList.add('hidden'));
+
+        async function handleGetLocation() {
+            locationStatus.textContent = "Fetching location...";
+            locationStatus.style.color = '#60A5FA';
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        locationInput.value = `Lat: ${latitude.toFixed(5)}, Lon: ${longitude.toFixed(5)}`;
+                        locationStatus.textContent = "Precise location acquired!";
+                        locationStatus.style.color = '#10B981';
+                    },
+                    (error) => {
+                        console.warn(`Geolocation error: ${error.message}`);
+                        fetchLocationByIp();
+                    }, { timeout: 8000 }
+                );
+            } else {
+                fetchLocationByIp();
+            }
+        }
+
+        async function fetchLocationByIp() {
+            locationStatus.textContent = "Precise location failed. Trying fallback...";
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                if (!response.ok) throw new Error('Response not OK');
+                const data = await response.json();
+                locationInput.value = `${data.city}, ${data.country_name} (Approx.)`;
+                locationStatus.textContent = "Approximate location found.";
+                locationStatus.style.color = '#FBBF24';
+            } catch (error) {
+                console.error("IP Geolocation failed:", error);
+                locationStatus.textContent = "Unable to retrieve location.";
+                locationStatus.style.color = '#F87171';
+            }
+        }
+
+        function addToBlockchainLedger(action, data) {
+            blockIdCounter++;
+            const timestamp = new Date().toISOString();
+            const blockHTML = `
+                <div class="bg-gray-800 p-3 rounded-lg mb-2 border-l-4 border-emerald-500">
+                    <p><span class="text-emerald-400">Block:</span> ${blockIdCounter}</p>
+                    <p><span class="text-emerald-400">Action:</span> ${action}</p>
+                    <p class="truncate"><span class="text-emerald-400">Data:</span> ${JSON.stringify(data)}</p>
+                </div>`;
+            blockchainContent.insertAdjacentHTML('afterbegin', blockHTML);
+        }
+
+        function addReportToFeed(reportData) {
+            const severityColors = {
+                'Low': 'bg-blue-500', 'Medium': 'bg-yellow-500',
+                'High': 'bg-orange-500', 'Critical': 'bg-red-500',
+            };
+            const reportHTML = `
+                <div class="glassmorphism p-4 rounded-xl shadow-md flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                    <img src="${reportData.imageUrl}" class="w-full md:w-40 h-40 object-cover rounded-lg" alt="Waste photo">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-bold text-lg">${reportData.location}</h3>
+                            <span class="text-xs font-semibold px-2 py-1 rounded-full ${severityColors[reportData.aiAnalysis.severity]} text-white">
+                                ${reportData.aiAnalysis.severity.toUpperCase()}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-1">${reportData.description}</p>
+                        <div class="text-xs mt-3 bg-gray-800 p-2 rounded">
+                            <p class="font-semibold">AI Analysis:</p>
+                            <p>> Detected Type: ${reportData.aiAnalysis.wasteType}</p>
+                            <p>> Confidence: ${(reportData.aiAnalysis.confidence * 100).toFixed(0)}%</p>
+                            <p class="font-bold mt-1 ${reportData.aiAnalysis.severity === 'Critical' ? 'text-red-400 animate-pulse' : ''}">
+                                ${reportData.aiAnalysis.severity === 'Critical' ? '>> URGENT CLEANUP ADVISED' : '>> Cleanup scheduled.'}
+                            </p>
+                        </div>
+                    </div>
+                </div>`;
+            reportsContent.insertAdjacentHTML('afterbegin', reportHTML);
+        }
+
+        function updateEcoPoints(pointsToAdd) {
+            userEcoPoints += pointsToAdd;
+            ecoPointsEl.textContent = userEcoPoints;
+            ecoPointsEl.classList.add('scale-150', 'text-yellow-300');
+            setTimeout(() => ecoPointsEl.classList.remove('scale-150', 'text-yellow-300'), 300);
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const location = e.target.location.value;
+            const description = e.target.description.value;
+            const photoFile = e.target['waste-photo'].files[0];
+
+            if (!location || !photoFile) {
+                showMessage("Error", "Please provide a location and a photo.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Analyzing Image...';
+            submitBtn.classList.add('btn-loading');
+
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const base64Image = event.target.result;
+                let imageUrl = '';
+                try {
+                    imageUrl = await uploadImageToImgbb(base64Image);
+                } catch (err) {
+                    showMessage("Error", "Image upload failed. Please try again.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Report';
+                    submitBtn.classList.remove('btn-loading');
+                    return;
+                }
+
+                // Call the local AI analysis function
+                const aiAnalysis = await analyzeWasteImage(base64Image);
+
+                reportIdCounter++;
+                const reportData = {
+                    id: `RPT-${String(reportIdCounter).padStart(4, '0')}`,
+                    location, description, imageUrl, aiAnalysis,
+                    timestamp: new Date().toISOString()
+                };
+
+                addReportToFeed(reportData);
+                addToBlockchainLedger('WASTE_REPORTED', { reportId: reportData.id, severity: aiAnalysis.severity });
+
+                // Send to Telegram admin
+                sendReportToTelegram(reportData);
+
+                const pointsAwarded = 10 + (['Low', 'Medium', 'High', 'Critical'].indexOf(aiAnalysis.severity) * 5);
+                updateEcoPoints(pointsAwarded);
+
+                showMessage("Success!", `Report submitted. AI classified severity as "${aiAnalysis.severity}". You've earned ${pointsAwarded} Eco-Points!`);
+
+                form.reset();
+                imagePreview.classList.add('hidden');
+                locationStatus.textContent = '';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Report';
+                submitBtn.classList.remove('btn-loading');
+            };
+            reader.readAsDataURL(photoFile);
+        }
+
+        function renderSmartBins() {
+            smartBinsGrid.innerHTML = '';
+            initialSmartBins.forEach(bin => {
+                const fill = bin.fillLevel;
+                let bgColor = fill > 90 ? 'bg-red-500' : fill > 70 ? 'bg-yellow-500' : 'bg-emerald-500';
+                const binHTML = `
+                    <div class="bg-gray-800 p-4 rounded-lg">
+                        <h4 class="font-bold">${bin.id}</h4>
+                        <p class="text-sm text-gray-400">${bin.location}</p>
+                        <div class="mt-3">
+                            <p class="text-sm">Fill Level: ${fill}%</p>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5 mt-1">
+                                <div class="${bgColor} h-2.5 rounded-full" style="width: ${fill}%"></div>
+                            </div>
+                        </div>
+                    </div>`;
+                smartBinsGrid.innerHTML += binHTML;
+            });
+        }
+
+        function simulateIoTUpdates() {
+            setInterval(() => {
+                initialSmartBins.forEach(bin => {
+                    bin.fillLevel = Math.max(0, Math.min(100, bin.fillLevel + (Math.random() * 6 - 3)));
+                });
+                if (!binsContent.classList.contains('hidden')) renderSmartBins();
+            }, 3000);
+        }
+
+        function handleTabClick(e) {
+            if (!e.target.classList.contains('tab-btn')) return;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+            e.target.classList.add('tab-active');
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+            const tabId = e.target.dataset.tab;
+            document.getElementById(`${tabId}-content`).classList.remove('hidden');
+            if (tabId === 'bins') renderSmartBins();
+        }
+
+        // --- Event Listeners ---
+        form.addEventListener('submit', handleFormSubmit);
+        tabs.addEventListener('click', handleTabClick);
+        getLocationBtn.addEventListener('click', handleGetLocation);
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    imagePreview.src = event.target.result;
+                    imagePreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSmartBins();
+            simulateIoTUpdates();
+            addToBlockchainLedger('SYSTEM_INIT', { status: 'Ledger online' });
+        });
+    </script>
+</body>
+</html>
